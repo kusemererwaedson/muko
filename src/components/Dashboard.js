@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { feeAPI, accountingAPI } from '../services/api';
+import { DashboardSkeleton } from './Skeleton';
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -39,28 +40,7 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return (
-      <div className="content-wrapper">
-        <div className="row">
-          <div className="col-md-6 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <div className="skeleton" style={{height: '20px', marginBottom: '10px'}}></div>
-                <div className="skeleton" style={{height: '40px', width: '60%'}}></div>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-6 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <div className="skeleton" style={{height: '20px', marginBottom: '10px'}}></div>
-                <div className="skeleton" style={{height: '40px', width: '80%'}}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (

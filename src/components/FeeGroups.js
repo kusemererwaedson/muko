@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { feeAPI } from '../services/api';
+import { FeeGroupsSkeleton } from './skeletons';
 
 const FeeGroups = () => {
   const [feeGroups, setFeeGroups] = useState([]);
   const [feeTypes, setFeeTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '', class: '', fee_type_id: '', amount: '', due_date: ''
@@ -20,26 +22,10 @@ const FeeGroups = () => {
       setFeeGroups(response.data);
     } catch (error) {
       console.error('Error fetching fee groups:', error);
+    } finally {
+      setLoading(false);
     }
   };
-
-  if (!feeGroups.length && feeGroups.length !== 0) {
-    return (
-      <div className="content-wrapper">
-        <div className="row">
-          <div className="col-md-12 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <div className="skeleton" style={{height: '20px', marginBottom: '15px', width: '25%'}}></div>
-                <div className="skeleton" style={{height: '40px', marginBottom: '10px'}}></div>
-                <div className="skeleton" style={{height: '40px', width: '70%'}}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const fetchFeeTypes = async () => {
     try {
@@ -49,6 +35,10 @@ const FeeGroups = () => {
       console.error('Error fetching fee types:', error);
     }
   };
+
+  if (loading) {
+    return <FeeGroupsSkeleton />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();

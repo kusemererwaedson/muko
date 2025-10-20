@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { communicationAPI } from '../services/api';
+import { EmailLogsSkeleton } from './skeletons';
 
 const EmailLogs = () => {
   const [emailLogs, setEmailLogs] = useState([]);
@@ -21,7 +22,7 @@ const EmailLogs = () => {
   };
 
   if (loading) {
-    return <div className="content-wrapper"><div className="text-center">Loading...</div></div>;
+    return <EmailLogsSkeleton />;
   }
 
   return (

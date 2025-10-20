@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { accountingAPI } from '../services/api';
+import { TransactionsSkeleton } from './skeletons';
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [voucherHeads, setVoucherHeads] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     voucher_head_id: '', account_id: '', amount: '', type: 'debit',
@@ -23,6 +25,8 @@ const Transactions = () => {
       setTransactions(response.data);
     } catch (error) {
       console.error('Error fetching transactions:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,6 +47,10 @@ const Transactions = () => {
       console.error('Error fetching voucher heads:', error);
     }
   };
+
+  if (loading) {
+    return <TransactionsSkeleton />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();

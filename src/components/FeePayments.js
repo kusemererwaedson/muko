@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { feeAPI, studentAPI } from '../services/api';
+import { FeePaymentsSkeleton } from './skeletons';
 
 const FeePayments = () => {
   const [payments, setPayments] = useState([]);
   const [students, setStudents] = useState([]);
   const [allocations, setAllocations] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     student_id: '', fee_allocation_id: '', amount: '', payment_method: 'cash',
@@ -23,6 +25,8 @@ const FeePayments = () => {
       setPayments(response.data);
     } catch (error) {
       console.error('Error fetching payments:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,11 +42,18 @@ const FeePayments = () => {
   const fetchAllocations = async () => {
     try {
       const response = await feeAPI.getAllocations();
-      setAllocations(response.data.filter(a => a.status !== 'paid'));
+      console.log('All allocations:', response.data);
+      const unpaidAllocations = response.data.filter(a => a.status !== 'paid');
+      console.log('Unpaid allocations:', unpaidAllocations);
+      setAllocations(unpaidAllocations);
     } catch (error) {
       console.error('Error fetching allocations:', error);
     }
   };
+
+  if (loading) {
+    return <FeePaymentsSkeleton />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,7 +84,10 @@ const FeePayments = () => {
   };
 
   const getStudentAllocations = () => {
-    return allocations.filter(a => a.student_id == formData.student_id);
+    const studentAllocations = allocations.filter(a => a.student_id == formData.student_id);
+    console.log('Student ID:', formData.student_id);
+    console.log('Student allocations:', studentAllocations);
+    return studentAllocations;
   };
 
   return (

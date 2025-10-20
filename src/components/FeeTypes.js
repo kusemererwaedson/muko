@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { feeAPI } from '../services/api';
+import { FeeTypesSkeleton } from './skeletons';
 
 const FeeTypes = () => {
   const [feeTypes, setFeeTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', description: '' });
 
@@ -16,25 +18,13 @@ const FeeTypes = () => {
       setFeeTypes(response.data);
     } catch (error) {
       console.error('Error fetching fee types:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!feeTypes.length && feeTypes.length !== 0) {
-    return (
-      <div className="content-wrapper">
-        <div className="row">
-          <div className="col-md-12 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <div className="skeleton" style={{height: '20px', marginBottom: '15px', width: '25%'}}></div>
-                <div className="skeleton" style={{height: '40px', marginBottom: '10px'}}></div>
-                <div className="skeleton" style={{height: '40px', width: '70%'}}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  if (loading) {
+    return <FeeTypesSkeleton />;
   }
 
   const handleSubmit = async (e) => {

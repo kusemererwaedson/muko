@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
@@ -16,16 +17,19 @@ import EmailLogs from './components/EmailLogs';
 import BulkReminders from './components/BulkReminders';
 import Layout from './components/Layout';
 import './App.css';
+import { authAPI } from './services/api';
 
 function App() {
   const [user, setUser] = useState(null);
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [loading, setLoading] = useState(true);
+  const [logoutError, setLogoutError] = useState('');
+
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    
+
     if (token && userData) {
       setUser(JSON.parse(userData));
     }
@@ -36,17 +40,28 @@ function App() {
     setUser(userData);
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    setCurrentPage('dashboard');
+  const handleLogout = async () => {
+    try {
+      await authAPI.logout();
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+      setCurrentPage('dashboard');
+      setLogoutError('');
+    } catch (error) {
+      console.error('Logout error:', error);
+      setLogoutError('Logout failed. Please try again.');
+    }
   };
+
+
 
   const renderContent = () => {
     switch (currentPage) {
       case 'dashboard':
         return <Dashboard />;
       case 'students':
-        return <Students />;
+        return <Students setCurrentPage={setCurrentPage} />;
       case 'fees-dashboard':
         return <FeeDashboard setCurrentPage={setCurrentPage} />;
       case 'fees-types':
@@ -85,8 +100,8 @@ function App() {
   }
 
   return (
-    <Layout 
-      user={user} 
+    <Layout
+      user={user}
       onLogout={handleLogout}
       currentPage={currentPage}
       setCurrentPage={setCurrentPage}

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { feeAPI, studentAPI } from '../services/api';
-import Skeleton from './Skeleton';
+import { FeeAllocateSkeleton } from './skeletons';
 
 const FeeAllocate = () => {
   const [students, setStudents] = useState([]);
   const [feeGroups, setFeeGroups] = useState([]);
   const [allocations, setAllocations] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ student_id: '', fee_group_id: '' });
 
@@ -39,11 +40,13 @@ const FeeAllocate = () => {
       setAllocations(response.data);
     } catch (error) {
       console.error('Error fetching allocations:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!allocations.length && allocations.length !== 0) {
-    return <Skeleton />;
+  if (loading) {
+    return <FeeAllocateSkeleton />;
   }
 
   const handleSubmit = async (e) => {

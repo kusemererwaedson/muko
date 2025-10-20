@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { accountingAPI } from '../services/api';
+import { AccountsSkeleton } from './skeletons';
 
 const Accounts = () => {
   const [accounts, setAccounts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', type: '', description: '' });
 
@@ -16,8 +18,14 @@ const Accounts = () => {
       setAccounts(response.data);
     } catch (error) {
       console.error('Error fetching accounts:', error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return <AccountsSkeleton />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();

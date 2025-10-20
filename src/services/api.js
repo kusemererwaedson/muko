@@ -19,22 +19,28 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle token expiration
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const originalRequest = error.config;
+
+    // Skip redirect if the request is logout or login
+    if (error.response?.status === 401 && originalRequest.url !== '/logout' && originalRequest.url !== '/login') {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
     }
+
     return Promise.reject(error);
   }
 );
 
+
 export const authAPI = {
   login: (credentials) => api.post('/login', credentials),
-  logout: () => api.post('/logout'),
+  logout: () => api.post('/logout').catch(error => {
+    return Promise.reject(error);
+  }),
   getUser: () => api.get('/user'),
 };
 
@@ -48,23 +54,23 @@ export const studentAPI = {
 
 export const feeAPI = {
   getDashboard: () => api.get('/fees/dashboard'),
-  
+
   // Fee Types
   getTypes: () => api.get('/fees/types'),
   createType: (data) => api.post('/fees/types', data),
-  
+
   // Fee Groups
   getGroups: () => api.get('/fees/groups'),
   createGroup: (data) => api.post('/fees/groups', data),
-  
+
   // Fee Allocations
   getAllocations: () => api.get('/fees/allocations'),
   createAllocation: (data) => api.post('/fees/allocations', data),
-  
+
   // Fee Payments
   getPayments: () => api.get('/fees/payments'),
   createPayment: (data) => api.post('/fees/payments', data),
-  
+
   // Send Reminders
   sendReminders: () => api.post('/fees/send-reminders'),
 };

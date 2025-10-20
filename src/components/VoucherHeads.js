@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { accountingAPI } from '../services/api';
+import { VoucherHeadsSkeleton } from './skeletons';
 
 const VoucherHeads = () => {
   const [voucherHeads, setVoucherHeads] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', description: '' });
 
@@ -16,8 +18,14 @@ const VoucherHeads = () => {
       setVoucherHeads(response.data);
     } catch (error) {
       console.error('Error fetching voucher heads:', error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return <VoucherHeadsSkeleton />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();

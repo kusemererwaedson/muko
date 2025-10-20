@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { feeAPI } from '../services/api';
+import { FeeDashboardSkeleton } from './skeletons';
 
 const FeeDashboard = ({ setCurrentPage }) => {
   const [dashboardData, setDashboardData] = useState({
@@ -10,6 +11,7 @@ const FeeDashboard = ({ setCurrentPage }) => {
     recentPayments: [],
     monthlyCollection: []
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchDashboardData();
@@ -21,8 +23,14 @@ const FeeDashboard = ({ setCurrentPage }) => {
       setDashboardData(response.data);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return <FeeDashboardSkeleton />;
+  }
 
   return (
     <div className="content-wrapper">

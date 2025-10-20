@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { feeAPI, studentAPI } from '../services/api';
+import { ReportsSkeleton } from './skeletons';
 
 const Reports = () => {
   const [reportType, setReportType] = useState('due');
@@ -10,6 +11,10 @@ const Reports = () => {
     dateFrom: '',
     dateTo: ''
   });
+
+  if (loading) {
+    return <ReportsSkeleton />;
+  }
 
   const generateReport = async () => {
     setLoading(true);

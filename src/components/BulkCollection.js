@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { studentAPI, feeAPI } from '../services/api';
+import { BulkCollectionSkeleton } from './skeletons';
 
 const BulkCollection = () => {
   const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedPayments, setSelectedPayments] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
@@ -22,10 +24,21 @@ const BulkCollection = () => {
       setStudents(filteredStudents);
     } catch (error) {
       console.error('Error fetching students:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handlePaymentSelect = (studentId, allocationId, amount) => {
+  if (loading) {
+    return <BulkCollectionSkeleton />;
+  }
+
+  const calculateDueAmount = (allocation) => {
+    const totalPaid = allocation.fee_payments?.reduce((sum, payment) => sum + parseFloat(payment.amount || 0), 0) || 0;
+    return parseFloat(allocation.amount || 0) - totalPaid;
+  };
+
+  const handlePaymentSelect = (studentId, allocationId, dueAmount) => {
     const paymentKey = `${studentId}-${allocationId}`;
     const existingIndex = selectedPayments.findIndex(p => `${p.student_id}-${p.allocation_id}` === paymentKey);
     
@@ -35,7 +48,7 @@ const BulkCollection = () => {
       setSelectedPayments([...selectedPayments, {
         student_id: studentId,
         allocation_id: allocationId,
-        amount: amount
+        amount: dueAmount
       }]);
     }
   };
@@ -171,22 +184,28 @@ const BulkCollection = () => {
                   </thead>
                   <tbody>
                     {students.map((student) => 
-                      student.fee_allocations?.filter(a => a.status !== 'paid').map((allocation) => (
-                        <tr key={`${student.id}-${allocation.id}`}>
-                          <td>
-                            <input
-                              type="checkbox"
-                              onChange={() => handlePaymentSelect(student.id, allocation.id, allocation.amount)}
-                              checked={selectedPayments.some(p => p.student_id === student.id && p.allocation_id === allocation.id)}
-                            />
-                          </td>
-                          <td>{student.first_name} {student.last_name}</td>
-                          <td>{student.class}</td>
-                          <td>{allocation.fee_group?.fee_type?.name}</td>
-                          <td>UGX {allocation.amount?.toLocaleString()}</td>
-                          <td>{new Date(allocation.due_date).toLocaleDateString()}</td>
-                        </tr>
-                      ))
+                      student.fee_allocations?.filter(a => {
+                        const dueAmount = calculateDueAmount(a);
+                        return dueAmount > 0;
+                      }).map((allocation) => {
+                        const dueAmount = calculateDueAmount(allocation);
+                        return (
+                          <tr key={`${student.id}-${allocation.id}`}>
+                            <td>
+                              <input
+                                type="checkbox"
+                                onChange={() => handlePaymentSelect(student.id, allocation.id, dueAmount)}
+                                checked={selectedPayments.some(p => p.student_id === student.id && p.allocation_id === allocation.id)}
+                              />
+                            </td>
+                            <td>{student.first_name} {student.last_name}</td>
+                            <td>{student.class}</td>
+                            <td>{allocation.fee_group?.fee_type?.name}</td>
+                            <td>UGX {dueAmount.toLocaleString()}</td>
+                            <td>{new Date(allocation.due_date).toLocaleDateString()}</td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { communicationAPI, studentAPI } from '../services/api';
+import { BulkRemindersSkeleton } from './skeletons';
 
 const BulkReminders = () => {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ const BulkReminders = () => {
     custom_message: ''
   });
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [classes, setClasses] = useState([]);
   const [sections, setSections] = useState([]);
@@ -29,8 +31,14 @@ const BulkReminders = () => {
       setSections(uniqueSections.sort());
     } catch (error) {
       console.error('Error fetching student options:', error);
+    } finally {
+      setInitialLoading(false);
     }
   };
+
+  if (initialLoading) {
+    return <BulkRemindersSkeleton />;
+  }
 
   const handleInputChange = (e) => {
     setFormData({

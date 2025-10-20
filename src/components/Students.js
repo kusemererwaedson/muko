@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { studentAPI } from '../services/api';
+import { StudentsTableSkeleton } from './Skeleton';
 
-const Students = () => {
+const Students = ({ setCurrentPage }) => {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -87,6 +88,7 @@ const Students = () => {
       resetForm();
     } catch (error) {
       console.error('Error saving student:', error);
+      alert('Error: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -132,26 +134,13 @@ const Students = () => {
   const handleCollectFees = (student) => {
     // Store student data for fee collection and navigate
     localStorage.setItem('selectedStudent', JSON.stringify(student));
-    window.location.hash = '#/fee-payments';
+    if (setCurrentPage) {
+      setCurrentPage('fees-payments');
+    }
   };
 
   if (loading) {
-    return (
-      <div className="content-wrapper">
-        <div className="row">
-          <div className="col-md-12 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <div className="skeleton" style={{height: '20px', marginBottom: '15px', width: '30%'}}></div>
-                <div className="skeleton" style={{height: '40px', marginBottom: '10px'}}></div>
-                <div className="skeleton" style={{height: '40px', marginBottom: '10px'}}></div>
-                <div className="skeleton" style={{height: '40px', width: '80%'}}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <StudentsTableSkeleton />;
   }
 
   return (
@@ -222,11 +211,14 @@ const Students = () => {
       </div>
 
       {showForm && (
-        <div className="row">
-          <div className="col-md-12 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <h4 className="card-title">{editingStudent ? 'Edit Student' : 'Add New Student'}</h4>
+        <div className="modal" style={{display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1050, overflow: 'auto'}}>
+          <div className="modal-dialog modal-xl" style={{margin: '30px auto', maxWidth: '90%'}}>
+            <div className="modal-content" style={{maxHeight: '90vh', overflow: 'auto'}}>
+              <div className="modal-header">
+                <h4 className="modal-title">{editingStudent ? 'Edit Student' : 'Add New Student'}</h4>
+                <button type="button" className="close" onClick={resetForm}>&times;</button>
+              </div>
+              <div className="modal-body">
                 <form onSubmit={handleSubmit}>
                   <div className="row">
                     <div className="col-md-6">
@@ -324,6 +316,21 @@ const Students = () => {
                     </div>
                     <div className="col-md-4">
                       <div className="form-group">
+                        <label>Roll Number</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={formData.roll}
+                          onChange={(e) => setFormData({...formData, roll: e.target.value})}
+                          placeholder="e.g., 001"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="row">
+                    <div className="col-md-4">
+                      <div className="form-group">
                         <label>Birthday</label>
                         <input
                           type="date"
@@ -345,9 +352,33 @@ const Students = () => {
                         />
                       </div>
                     </div>
+                    <div className="col-md-4">
+                      <div className="form-group">
+                        <label>Student Email</label>
+                        <input
+                          type="email"
+                          className="form-control"
+                          value={formData.email}
+                          onChange={(e) => setFormData({...formData, email: e.target.value})}
+                          placeholder="e.g., student@email.com"
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="row">
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label>Student Phone</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                          placeholder="e.g., +256700123456"
+                        />
+                      </div>
+                    </div>
                     <div className="col-md-6">
                       <div className="form-group">
                         <label>Guardian Name</label>
@@ -361,6 +392,9 @@ const Students = () => {
                         />
                       </div>
                     </div>
+                  </div>
+
+                  <div className="row">
                     <div className="col-md-6">
                       <div className="form-group">
                         <label>Guardian Phone</label>
@@ -426,12 +460,14 @@ const Students = () => {
                     </div>
                   </div>
 
-                  <button type="submit" className="btn btn-primary mr-2">
-                    {editingStudent ? 'Update' : 'Save'}
-                  </button>
-                  <button type="button" className="btn btn-light" onClick={resetForm}>
-                    Cancel
-                  </button>
+                  <div className="modal-footer">
+                    <button type="submit" className="btn btn-primary mr-2">
+                      {editingStudent ? 'Update' : 'Save'}
+                    </button>
+                    <button type="button" className="btn btn-light" onClick={resetForm}>
+                      Cancel
+                    </button>
+                  </div>
                 </form>
               </div>
             </div>

@@ -1,7 +1,20 @@
-import React from 'react';
+// src/components/Layout.js
+import React, { useState } from 'react';
 import { authAPI } from '../services/api';
 
 const Layout = ({ children, user, onLogout, currentPage, setCurrentPage }) => {
+  const [collapsedMenus, setCollapsedMenus] = useState({
+    fees: false,
+    accounting: false,
+    communications: false
+  });
+
+  const toggleMenu = (menuName) => {
+    setCollapsedMenus(prev => ({
+      ...prev,
+      [menuName]: !prev[menuName]
+    }));
+  };
   const handleToggleSidebar = () => {
     document.body.classList.toggle('sidebar-icon-only');
   };
@@ -83,17 +96,19 @@ const Layout = ({ children, user, onLogout, currentPage, setCurrentPage }) => {
             <li className="nav-item">
               <a 
                 className="nav-link pr-4"
-                data-toggle="collapse" 
-                href="#fees" 
-                aria-expanded={currentPage.startsWith('fees')} 
+                href="#"
+                onClick={(e) => { e.preventDefault(); toggleMenu('fees'); }}
+                onMouseEnter={(e) => e.preventDefault()}
+                onMouseOver={(e) => e.preventDefault()}
+                aria-expanded={collapsedMenus.fees} 
                 aria-controls="fees"
-                style={currentPage.startsWith('fees') ? {background: '#4B49AC', color: '#fff'} : {}}
+                style={{...{pointerEvents: 'auto'}, ...(currentPage.startsWith('fees') ? {background: '#4B49AC', color: '#fff'} : {})}}
               >
                 <i className="icon-credit-card menu-icon"></i>
                 <span className="menu-title">Fee Management</span>
                 <i className="menu-arrow"></i>
               </a>
-              <div className={`collapse ${currentPage.startsWith('fees') ? 'show' : ''}`} id="fees">
+              <div className={`collapse ${collapsedMenus.fees ? 'show' : ''}`} id="fees">
                 <ul className="nav flex-column sub-menu" style={{background: '#fff', margin: 0, padding: 0, marginTop: '5px'}}>
                   <li className="nav-item">
                     <a 
@@ -171,17 +186,19 @@ const Layout = ({ children, user, onLogout, currentPage, setCurrentPage }) => {
             <li className="nav-item">
               <a 
                 className="nav-link pr-4"
-                data-toggle="collapse" 
-                href="#accounting" 
-                aria-expanded={currentPage.startsWith('accounting')} 
+                href="#"
+                onClick={(e) => { e.preventDefault(); toggleMenu('accounting'); }}
+                onMouseEnter={(e) => e.preventDefault()}
+                onMouseOver={(e) => e.preventDefault()}
+                aria-expanded={collapsedMenus.accounting} 
                 aria-controls="accounting"
-                style={currentPage.startsWith('accounting') ? {background: '#4B49AC', color: '#fff'} : {}}
+                style={{...{pointerEvents: 'auto'}, ...(currentPage.startsWith('accounting') ? {background: '#4B49AC', color: '#fff'} : {})}}
               >
                 <i className="icon-paper menu-icon"></i>
                 <span className="menu-title">Accounting</span>
                 <i className="menu-arrow"></i>
               </a>
-              <div className={`collapse ${currentPage.startsWith('accounting') ? 'show' : ''}`} id="accounting">
+              <div className={`collapse ${collapsedMenus.accounting ? 'show' : ''}`} id="accounting">
                 <ul className="nav flex-column sub-menu" style={{background: '#fff', margin: 0, padding: 0, marginTop: '5px'}}>
                   <li className="nav-item">
                     <a 
@@ -219,17 +236,19 @@ const Layout = ({ children, user, onLogout, currentPage, setCurrentPage }) => {
             <li className="nav-item">
               <a 
                 className="nav-link pr-4"
-                data-toggle="collapse" 
-                href="#communications" 
-                aria-expanded={currentPage.startsWith('communications')} 
+                href="#"
+                onClick={(e) => { e.preventDefault(); toggleMenu('communications'); }}
+                onMouseEnter={(e) => e.preventDefault()}
+                onMouseOver={(e) => e.preventDefault()}
+                aria-expanded={collapsedMenus.communications} 
                 aria-controls="communications"
-                style={currentPage.startsWith('communications') ? {background: '#4B49AC', color: '#fff'} : {}}
+                style={{...{pointerEvents: 'auto'}, ...(currentPage.startsWith('communications') ? {background: '#4B49AC', color: '#fff'} : {})}}
               >
                 <i className="icon-speech menu-icon"></i>
                 <span className="menu-title">Communications</span>
                 <i className="menu-arrow"></i>
               </a>
-              <div className={`collapse ${currentPage.startsWith('communications') ? 'show' : ''}`} id="communications">
+              <div className={`collapse ${collapsedMenus.communications ? 'show' : ''}`} id="communications">
                 <ul className="nav flex-column sub-menu" style={{background: '#fff', margin: 0, padding: 0, marginTop: '5px'}}>
                   <li className="nav-item">
                     <a 
