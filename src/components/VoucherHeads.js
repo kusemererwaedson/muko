@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Box, Card, CardContent, Typography, Button, TextField,
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Grid, Collapse,
+  Skeleton
+} from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 import { accountingAPI } from '../services/api';
-import { VoucherHeadsSkeleton } from './skeletons';
+
 
 const VoucherHeads = () => {
   const [voucherHeads, setVoucherHeads] = useState([]);
@@ -24,7 +31,12 @@ const VoucherHeads = () => {
   };
 
   if (loading) {
-    return <VoucherHeadsSkeleton />;
+    return (
+      <Box p={3}>
+        <Skeleton variant="text" width={200} height={30} sx={{ mb: 2 }} />
+        <Skeleton variant="rectangular" height={400} />
+      </Box>
+    );
   }
 
   const handleSubmit = async (e) => {
@@ -40,92 +52,88 @@ const VoucherHeads = () => {
   };
 
   return (
-    <div className="content-wrapper">
-      <div className="row">
-        <div className="col-md-12 grid-margin">
-          <div className="row">
-            <div className="col-12 col-xl-8 mb-4 mb-xl-0">
-              <h3 className="font-weight-bold">Voucher Heads</h3>
-              <h6 className="font-weight-normal mb-0">Manage voucher categories</h6>
-            </div>
-            <div className="col-12 col-xl-4">
-              <div className="justify-content-end d-flex">
-                <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-                  {showForm ? 'Cancel' : 'Add Voucher Head'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <Box>
+      <Box mb={4}>
+        <Grid container justifyContent="space-between" alignItems="center">
+          <Grid item xs={12} md={8}>
+            <Typography variant="h4" gutterBottom>Voucher Heads</Typography>
+            <Typography variant="body1" color="text.secondary">
+              Manage voucher categories
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Box display="flex" justifyContent={{ xs: 'flex-start', md: 'flex-end' }} mt={{ xs: 2, md: 0 }}>
+              <Button
+                variant={showForm ? "outlined" : "contained"}
+                startIcon={<AddIcon />}
+                onClick={() => setShowForm(!showForm)}
+              >
+                {showForm ? 'Cancel' : 'Add Voucher Head'}
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
 
-      {showForm && (
-        <div className="row">
-          <div className="col-md-12 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <h4 className="card-title">Add New Voucher Head</h4>
-                <form onSubmit={handleSubmit}>
-                  <div className="form-group">
-                    <label>Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      placeholder="e.g., Office Supplies, Transport, Utilities"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Description</label>
-                    <textarea
-                      className="form-control"
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      placeholder="Brief description of this voucher category"
-                      rows="3"
-                    />
-                  </div>
-                  <button type="submit" className="btn btn-primary mr-2">Save</button>
-                  <button type="button" className="btn btn-light" onClick={() => setShowForm(false)}>Cancel</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Collapse in={showForm}>
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>Add New Voucher Head</Typography>
+            <Box component="form" onSubmit={handleSubmit}>
+              <TextField
+                fullWidth
+                label="Name"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                placeholder="e.g., Office Supplies, Transport, Utilities"
+                required
+                margin="normal"
+              />
+              <TextField
+                fullWidth
+                label="Description"
+                multiline
+                rows={3}
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                placeholder="Brief description of this voucher category"
+                margin="normal"
+              />
+              <Box mt={2}>
+                <Button type="submit" variant="contained" sx={{ mr: 1 }}>Save</Button>
+                <Button variant="outlined" onClick={() => setShowForm(false)}>Cancel</Button>
+              </Box>
+            </Box>
+          </CardContent>
+        </Card>
+      </Collapse>
 
-      <div className="row">
-        <div className="col-md-12 grid-margin stretch-card">
-          <div className="card">
-            <div className="card-body">
-              <p className="card-title mb-0">Voucher Heads List</p>
-              <div className="table-responsive">
-                <table className="table table-striped table-borderless">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Description</th>
-                      <th>Created</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {voucherHeads.map((head) => (
-                      <tr key={head.id}>
-                        <td>{head.name}</td>
-                        <td>{head.description}</td>
-                        <td>{new Date(head.created_at).toLocaleDateString()}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>Voucher Heads List</Typography>
+          <TableContainer component={Paper} elevation={0}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Description</TableCell>
+                  <TableCell>Created</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {voucherHeads.map((head) => (
+                  <TableRow key={head.id} hover>
+                    <TableCell>{head.name}</TableCell>
+                    <TableCell>{head.description}</TableCell>
+                    <TableCell>{new Date(head.created_at).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

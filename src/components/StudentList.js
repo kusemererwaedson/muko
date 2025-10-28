@@ -1,18 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { getStudents } from '../services/api';
+import {
+  Box, Card, CardContent, Typography, Button, Table, TableBody, TableCell,
+  TableContainer, TableHead, TableRow, Paper, Chip, IconButton, Pagination,
+  Skeleton
+} from '@mui/material';
+import { Add as AddIcon, Visibility as VisibilityIcon, Payment as PaymentIcon } from '@mui/icons-material';
+import { studentAPI } from '../services/api';
+
 
 function StudentList() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    per_page: 10,
+    total: 0
+  });
 
   useEffect(() => {
     fetchStudents();
   }, []);
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (page = 1) => {
     try {
-      const response = await getStudents();
-      setStudents(response.data);
+      setLoading(true);
+      const response = await studentAPI.getAll({ page, per_page: 10 });
+      
+      if (response.data.data) {
+        setStudents(response.data.data);
+        setPagination({
+          current_page: response.data.current_page,
+          last_page: response.data.last_page,
+          per_page: response.data.per_page,
+          total: response.data.total
+        });
+      } else {
+        setStudents(response.data);
+      }
     } catch (error) {
       console.error('Error fetching students:', error);
     } finally {
@@ -20,74 +45,96 @@ function StudentList() {
     }
   };
 
-  if (loading) return <div className="content-wrapper"><div>Loading...</div></div>;
+  const handlePageChange = (page) => {
+    fetchStudents(page);
+  };
+
+  if (loading) return (
+    <Box p={3}>
+      <Skeleton variant="text" width={200} height={30} sx={{ mb: 2 }} />
+      <Skeleton variant="rectangular" height={400} />
+    </Box>
+  );
 
   return (
-    <div className="content-wrapper">
-      <div className="row">
-        <div className="col-md-12 grid-margin">
-          <div className="d-flex justify-content-between flex-wrap">
-            <div className="d-flex align-items-end flex-wrap">
-              <div className="mr-md-3 mr-xl-5">
-                <h2>Students</h2>
-                <p className="mb-md-0">Manage student records</p>
-              </div>
-            </div>
-            <div className="d-flex justify-content-between align-items-end flex-wrap">
-              <button className="btn btn-primary mt-2 mt-xl-0">Add New Student</button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        <Box>
+          <Typography variant="h4" gutterBottom>Students</Typography>
+          <Typography variant="body1" color="text.secondary">Manage student records</Typography>
+        </Box>
+        <Button variant="contained" startIcon={<AddIcon />}>Add New Student</Button>
+      </Box>
 
-      <div className="row">
-        <div className="col-md-12 grid-margin stretch-card">
-          <div className="card">
-            <div className="card-body">
-              <div className="table-responsive">
-                <table className="table table-striped table-borderless">
-                  <thead>
-                    <tr>
-                      <th>Register No</th>
-                      <th>Name</th>
-                      <th>Class</th>
-                      <th>Guardian</th>
-                      <th>Phone</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {students.length > 0 ? students.map(student => (
-                      <tr key={student.id}>
-                        <td className="font-weight-bold">{student.register_no}</td>
-                        <td>{student.full_name}</td>
-                        <td>{student.class} {student.section}</td>
-                        <td>{student.guardian_name}</td>
-                        <td>{student.guardian_phone}</td>
-                        <td>
-                          <label className={`badge badge-${student.active ? 'success' : 'danger'}`}>
-                            {student.active ? 'Active' : 'Inactive'}
-                          </label>
-                        </td>
-                        <td>
-                          <button className="btn btn-sm btn-info mr-2">View</button>
-                          <button className="btn btn-sm btn-success">Collect Fees</button>
-                        </td>
-                      </tr>
-                    )) : (
-                      <tr>
-                        <td colSpan="7" className="text-center">No students found</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <Card>
+        <CardContent>
+          <TableContainer component={Paper} elevation={0}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Register No</TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Class</TableCell>
+                  <TableCell>Guardian</TableCell>
+                  <TableCell>Phone</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {students.length > 0 ? students.map(student => (
+                  <TableRow key={student.id} hover>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight="bold">{student.registration_no || student.lin}</Typography>
+                    </TableCell>
+                    <TableCell>{student.full_name}</TableCell>
+                    <TableCell>{student.class_name || student.school_class?.name || 'N/A'}</TableCell>
+                    <TableCell>{student.guardian_name}</TableCell>
+                    <TableCell>{student.guardian_phone}</TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={student.active ? 'Active' : 'Inactive'}
+                        color={student.active ? 'success' : 'error'}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton size="small" color="info" sx={{ mr: 1 }}>
+                        <VisibilityIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" color="success">
+                        <PaymentIcon fontSize="small" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
+                      <Typography variant="body2" color="text.secondary">No students found</Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          
+          {pagination.last_page > 1 && (
+            <Box display="flex" justifyContent="space-between" alignItems="center" mt={3}>
+              <Typography variant="body2" color="text.secondary">
+                Showing {((pagination.current_page - 1) * pagination.per_page) + 1} to {Math.min(pagination.current_page * pagination.per_page, pagination.total)} of {pagination.total} entries
+              </Typography>
+              <Pagination
+                count={pagination.last_page}
+                page={pagination.current_page}
+                onChange={(event, page) => handlePageChange(page)}
+                color="primary"
+                size="small"
+              />
+            </Box>
+          )}
+        </CardContent>
+      </Card>
+    </Box>
   );
 }
 

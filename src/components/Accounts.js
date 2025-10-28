@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Box, Card, CardContent, Typography, Button, TextField, Select, MenuItem,
+  FormControl, InputLabel, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Grid, Dialog, DialogTitle, DialogContent, DialogActions, Chip,
+  Skeleton
+} from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 import { accountingAPI } from '../services/api';
-import { AccountsSkeleton } from './skeletons';
+
 
 const Accounts = () => {
   const [accounts, setAccounts] = useState([]);
@@ -24,7 +31,54 @@ const Accounts = () => {
   };
 
   if (loading) {
-    return <AccountsSkeleton />;
+    return (
+      <Box>
+        {/* Header Skeleton */}
+        <Box mb={4}>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item xs={12} md={8}>
+              <Skeleton variant="text" width={150} height={32} sx={{ mb: 1 }} />
+              <Skeleton variant="text" width={200} height={20} />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Box display="flex" justifyContent={{ xs: 'flex-start', md: 'flex-end' }} mt={{ xs: 2, md: 0 }}>
+                <Skeleton variant="rectangular" width={120} height={36} sx={{ borderRadius: 1 }} />
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+        
+        {/* Accounts Table Skeleton */}
+        <Card>
+          <CardContent>
+            <Skeleton variant="text" width={160} height={24} sx={{ mb: 2 }} />
+            <TableContainer component={Paper} elevation={0}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    {['Account Name', 'Type', 'Description', 'Created'].map((header, i) => (
+                      <TableCell key={i}>
+                        <Skeleton variant="text" width={80} height={16} />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {[...Array(6)].map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton variant="text" width={120} height={16} /></TableCell>
+                      <TableCell><Skeleton variant="rectangular" width={60} height={20} sx={{ borderRadius: 3 }} /></TableCell>
+                      <TableCell><Skeleton variant="text" width={150} height={16} /></TableCell>
+                      <TableCell><Skeleton variant="text" width={80} height={16} /></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
+        </Card>
+      </Box>
+    );
   }
 
   const handleSubmit = async (e) => {
@@ -40,117 +94,108 @@ const Accounts = () => {
   };
 
   return (
-    <div className="content-wrapper">
-      <div className="row">
-        <div className="col-md-12 grid-margin">
-          <div className="row">
-            <div className="col-12 col-xl-8 mb-4 mb-xl-0">
-              <h3 className="font-weight-bold">Accounts</h3>
-              <h6 className="font-weight-normal mb-0">Manage chart of accounts</h6>
-            </div>
-            <div className="col-12 col-xl-4">
-              <div className="justify-content-end d-flex">
-                <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-                  {showForm ? 'Cancel' : 'Add Account'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <Box>
+      <Box mb={4}>
+        <Grid container justifyContent="space-between" alignItems="center">
+          <Grid item xs={12} md={8}>
+            <Typography variant="h4" gutterBottom>Accounts</Typography>
+            <Typography variant="body1" color="text.secondary">
+              Manage chart of accounts
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Box display="flex" justifyContent={{ xs: 'flex-start', md: 'flex-end' }} mt={{ xs: 2, md: 0 }}>
+              <Button
+                variant={showForm ? "outlined" : "contained"}
+                startIcon={<AddIcon />}
+                onClick={() => setShowForm(!showForm)}
+              >
+                {showForm ? 'Cancel' : 'Add Account'}
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
 
-      {showForm && (
-        <div className="row">
-          <div className="col-md-12 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <h4 className="card-title">Add New Account</h4>
-                <form onSubmit={handleSubmit}>
-                  <div className="row">
-                    <div className="col-md-6">
-                      <div className="form-group">
-                        <label>Account Name</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={formData.name}
-                          onChange={(e) => setFormData({...formData, name: e.target.value})}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="form-group">
-                        <label>Account Type</label>
-                        <select
-                          className="form-control"
-                          value={formData.type}
-                          onChange={(e) => setFormData({...formData, type: e.target.value})}
-                          required
-                        >
-                          <option value="">Select Type</option>
-                          <option value="asset">Asset</option>
-                          <option value="liability">Liability</option>
-                          <option value="equity">Equity</option>
-                          <option value="income">Income</option>
-                          <option value="expense">Expense</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label>Description</label>
-                    <textarea
-                      className="form-control"
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    />
-                  </div>
-                  <button type="submit" className="btn btn-primary mr-2">Save</button>
-                  <button type="button" className="btn btn-light" onClick={() => setShowForm(false)}>Cancel</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Dialog open={showForm} onClose={() => setShowForm(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Add New Account</DialogTitle>
+        <DialogContent>
+          <Box component="form" onSubmit={handleSubmit} sx={{ pt: 1 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Account Name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth required>
+                  <InputLabel>Account Type</InputLabel>
+                  <Select
+                    value={formData.type}
+                    label="Account Type"
+                    onChange={(e) => setFormData({...formData, type: e.target.value})}
+                  >
+                    <MenuItem value="asset">Asset</MenuItem>
+                    <MenuItem value="liability">Liability</MenuItem>
+                    <MenuItem value="equity">Equity</MenuItem>
+                    <MenuItem value="income">Income</MenuItem>
+                    <MenuItem value="expense">Expense</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Description"
+                  multiline
+                  rows={3}
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowForm(false)}>Cancel</Button>
+          <Button onClick={handleSubmit} variant="contained">Save</Button>
+        </DialogActions>
+      </Dialog>
 
-      <div className="row">
-        <div className="col-md-12 grid-margin stretch-card">
-          <div className="card">
-            <div className="card-body">
-              <p className="card-title mb-0">Chart of Accounts</p>
-              <div className="table-responsive">
-                <table className="table table-striped table-borderless">
-                  <thead>
-                    <tr>
-                      <th>Account Name</th>
-                      <th>Type</th>
-                      <th>Description</th>
-                      <th>Created</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {accounts.map((account) => (
-                      <tr key={account.id}>
-                        <td>{account.name}</td>
-                        <td>
-                          <div className="badge badge-outline-primary">
-                            {account.type}
-                          </div>
-                        </td>
-                        <td>{account.description}</td>
-                        <td>{new Date(account.created_at).toLocaleDateString()}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>Chart of Accounts</Typography>
+          <TableContainer component={Paper} elevation={0}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Account Name</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell>Description</TableCell>
+                  <TableCell>Created</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {accounts.map((account) => (
+                  <TableRow key={account.id} hover>
+                    <TableCell>{account.name}</TableCell>
+                    <TableCell>
+                      <Chip label={account.type} color="primary" size="small" />
+                    </TableCell>
+                    <TableCell>{account.description}</TableCell>
+                    <TableCell>{new Date(account.created_at).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

@@ -1,4 +1,14 @@
 import React, { useState } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Container
+} from '@mui/material';
 import { authAPI } from '../services/api';
 
 const Login = ({ onLogin }) => {
@@ -27,59 +37,68 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="container-fluid page-body-wrapper full-page-wrapper">
-      <div className="content-wrapper d-flex align-items-center auth px-0">
-        <div className="row w-100 mx-0">
-          <div className="col-lg-4 mx-auto">
-            <div className="auth-form-light text-left py-5 px-4 px-sm-5">
-              <div className="brand-logo text-center">
-                <h3 className="text-primary">Muko High School</h3>
-              </div>
-              <h4>Hello! Let's get started</h4>
-              <h6 className="font-weight-light">Sign in to continue.</h6>
-              
-              {error && (
-                <div className="alert alert-danger" role="alert">
-                  {error}
-                </div>
-              )}
-              
-              <form className="pt-3" onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <input
-                    type="email"
-                    className="form-control form-control-lg"
-                    placeholder="Email"
-                    value={credentials.email}
-                    onChange={(e) => setCredentials({...credentials, email: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <input
-                    type="password"
-                    className="form-control form-control-lg"
-                    placeholder="Password"
-                    value={credentials.password}
-                    onChange={(e) => setCredentials({...credentials, password: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="mt-3">
-                  <button
-                    type="submit"
-                    className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn"
-                    disabled={loading}
-                  >
-                    {loading ? 'SIGNING IN...' : 'SIGN IN'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Container maxWidth="sm" sx={{ p: { xs: 1, sm: 2 } }}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        minHeight="100vh"
+      >
+        <Card sx={{ width: '100%', maxWidth: 400 }}>
+          <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+            <Box textAlign="center" mb={3}>
+              <Typography variant="h4" color="primary" gutterBottom sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
+                Muko High School
+              </Typography>
+            </Box>
+            <Typography variant="h5" gutterBottom sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+              Hello! Let's get started
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={3}>
+              Sign in to continue.
+            </Typography>
+            
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+            
+            <Box component="form" onSubmit={handleSubmit}>
+              <TextField
+                fullWidth
+                type="email"
+                label="Email"
+                value={credentials.email}
+                onChange={(e) => setCredentials({...credentials, email: e.target.value})}
+                required
+                margin="normal"
+              />
+              <TextField
+                fullWidth
+                type="password"
+                label="Password"
+                value={credentials.password}
+                onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                required
+                margin="normal"
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                disabled={loading}
+                sx={{ mt: 3 }}
+              >
+                {loading ? 'SIGNING IN...' : 'SIGN IN'}
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
+    </Container>
   );
 };
 

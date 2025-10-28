@@ -1,6 +1,8 @@
+//src/services/api.js
+
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -39,21 +41,43 @@ api.interceptors.response.use(
 export const authAPI = {
   login: (credentials) => api.post('/login', credentials),
   logout: () => api.post('/logout').catch(error => {
-    return Promise.reject(error);
+    console.warn('Logout API call failed:', error);
+    // Don't reject - allow logout to continue even if server call fails
+    return Promise.resolve();
   }),
   getUser: () => api.get('/user'),
 };
 
 export const studentAPI = {
-  getAll: () => api.get('/students'),
+  getAll: (params = {}) => api.get('/students', { params }),
   getById: (id) => api.get(`/students/${id}`),
   create: (data) => api.post('/students', data),
   update: (id, data) => api.put(`/students/${id}`, data),
   delete: (id) => api.delete(`/students/${id}`),
+  bulkCreate: (data) => api.post('/students/bulk', data),
+  
+  // Classes and Streams
+  getClasses: () => api.get('/students/classes'),
+  getStreams: (classId) => api.get(`/students/streams/${classId || ''}`),
+  
+  // Filtering
+  search: (params) => api.get('/students', { params }),
+  
+  // Import/Export
+  exportExcel: (format = 'csv') => api.get('/students/export', { 
+    params: { format },
+    responseType: 'blob' 
+  }),
+  importExcel: (formData) => api.post('/students/import', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  downloadTemplate: () => api.get('/students/template', { responseType: 'blob' }),
+  syncClasses: () => api.post('/students/sync-classes'),
 };
 
 export const feeAPI = {
   getDashboard: () => api.get('/fees/dashboard'),
+  getReports: (params) => api.get('/fees/reports', { params }),
 
   // Fee Types
   getTypes: () => api.get('/fees/types'),
@@ -84,9 +108,34 @@ export const accountingAPI = {
   createTransaction: (data) => api.post('/accounting/transactions', data),
 };
 
+export const academicAPI = {
+  // Classes
+  getClasses: () => api.get('/academic/classes'),
+  createClass: (data) => api.post('/academic/classes', data),
+  updateClass: (id, data) => api.put(`/academic/classes/${id}`, data),
+  deleteClass: (id) => api.delete(`/academic/classes/${id}`),
+  
+  // Streams
+  getStreams: () => api.get('/academic/streams'),
+  createStream: (data) => api.post('/academic/streams', data),
+  
+  // Levels
+  getLevels: () => api.get('/academic/levels'),
+  createLevel: (data) => api.post('/academic/levels', data),
+  
+  // Terms
+  getTerms: () => api.get('/academic/terms'),
+  createTerm: (data) => api.post('/academic/terms', data),
+  setCurrentTerm: (id) => api.put(`/academic/terms/${id}/set-current`),
+};
+
 export const communicationAPI = {
   getEmailLogs: () => api.get('/communications/email-logs'),
   sendBulkReminders: (data) => api.post('/communications/bulk-reminders', data),
+  
+  // SMS
+  getSmsLogs: () => api.get('/communications/sms-logs'),
+  sendSms: (data) => api.post('/communications/send-sms', data),
 };
 
 export default api;

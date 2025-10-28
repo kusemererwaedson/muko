@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Box, Card, CardContent, Typography, Button, Grid, Table, TableBody,
+  TableCell, TableContainer, TableHead, TableRow, Paper,
+  Skeleton
+} from '@mui/material';
+import {
+  People as PeopleIcon,
+  TrendingUp as TrendingUpIcon,
+  Warning as WarningIcon,
+  Error as ErrorIcon,
+  Payment as PaymentIcon,
+  Email as EmailIcon,
+  Assessment as AssessmentIcon,
+  Add as AddIcon
+} from '@mui/icons-material';
 import { feeAPI } from '../services/api';
-import { FeeDashboardSkeleton } from './skeletons';
+
 
 const FeeDashboard = ({ setCurrentPage }) => {
   const [dashboardData, setDashboardData] = useState({
@@ -29,199 +44,166 @@ const FeeDashboard = ({ setCurrentPage }) => {
   };
 
   if (loading) {
-    return <FeeDashboardSkeleton />;
+    return (
+      <Box p={3}>
+        <Skeleton variant="text" width={200} height={30} sx={{ mb: 2 }} />
+        <Skeleton variant="rectangular" height={400} />
+      </Box>
+    );
   }
 
   return (
-    <div className="content-wrapper">
-      <div className="row">
-        <div className="col-md-12 grid-margin">
-          <div className="row">
-            <div className="col-12 col-xl-8 mb-4 mb-xl-0">
-              <h3 className="font-weight-bold">Fee Management Dashboard</h3>
-              <h6 className="font-weight-normal mb-0">Comprehensive fee tracking and collection overview</h6>
-            </div>
-          </div>
-        </div>
-      </div>
+    <Box>
+      <Box mb={4}>
+        <Typography variant="h4" gutterBottom>Fee Management Dashboard</Typography>
+        <Typography variant="body1" color="text.secondary">
+          Comprehensive fee tracking and collection overview
+        </Typography>
+      </Box>
 
-      <div className="row">
-        <div className="col-md-6 col-xl-3 grid-margin stretch-card">
-          <div className="card bg-gradient-primary text-white">
-            <div className="card-body">
-              <p className="mb-2">Total Students</p>
-              <h5 className="mb-0">{dashboardData.totalStudents}</h5>
-            </div>
-          </div>
-        </div>
+      <Grid container spacing={3} mb={4}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
+            <CardContent>
+              <Box display="flex" alignItems="center">
+                <PeopleIcon sx={{ fontSize: 40, mr: 2 }} />
+                <Box>
+                  <Typography variant="body2">Total Students</Typography>
+                  <Typography variant="h4">{dashboardData.totalStudents}</Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
         
-        <div className="col-md-6 col-xl-3 grid-margin stretch-card">
-          <div className="card bg-gradient-success text-white">
-            <div className="card-body">
-              <p className="mb-2">Total Collected</p>
-              <h5 className="mb-0">UGX {dashboardData.totalCollected?.toLocaleString()}</h5>
-            </div>
-          </div>
-        </div>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}>
+            <CardContent>
+              <Box display="flex" alignItems="center">
+                <TrendingUpIcon sx={{ fontSize: 40, mr: 2 }} />
+                <Box>
+                  <Typography variant="body2">Total Collected</Typography>
+                  <Typography variant="h5">UGX {dashboardData.totalCollected?.toLocaleString()}</Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
         
-        <div className="col-md-6 col-xl-3 grid-margin stretch-card">
-          <div className="card bg-gradient-warning text-white">
-            <div className="card-body">
-              <p className="mb-2">Total Due</p>
-              <h5 className="mb-0">UGX {dashboardData.totalDue?.toLocaleString()}</h5>
-            </div>
-          </div>
-        </div>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', color: 'white' }}>
+            <CardContent>
+              <Box display="flex" alignItems="center">
+                <WarningIcon sx={{ fontSize: 40, mr: 2 }} />
+                <Box>
+                  <Typography variant="body2">Total Due</Typography>
+                  <Typography variant="h5">UGX {dashboardData.totalDue?.toLocaleString()}</Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
         
-        <div className="col-md-6 col-xl-3 grid-margin stretch-card">
-          <div className="card bg-gradient-danger text-white">
-            <div className="card-body">
-              <p className="mb-2">Overdue</p>
-              <h5 className="mb-0">{dashboardData.overdueCount}</h5>
-            </div>
-          </div>
-        </div>
-      </div>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: 'white' }}>
+            <CardContent>
+              <Box display="flex" alignItems="center">
+                <ErrorIcon sx={{ fontSize: 40, mr: 2 }} />
+                <Box>
+                  <Typography variant="body2">Overdue</Typography>
+                  <Typography variant="h4">{dashboardData.overdueCount}</Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
-      <div className="row">
-        <div className="col-md-6 grid-margin stretch-card">
-          <div className="card">
-            <div className="card-body">
-              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px'}}>
-                <p className="card-title mb-0">Monthly Collection</p>
-                <div style={{display: 'flex', alignItems: 'center'}}>
-                  <div style={{width: '20px', height: '3px', backgroundColor: '#4BC0C0', marginRight: '8px'}}></div>
-                  <span style={{fontSize: '12px', color: '#666'}}>Collection Amount</span>
-                </div>
-              </div>
-              <div style={{height: '250px', position: 'relative', padding: '20px'}}>
-                <svg width="300" height="200" viewBox="0 0 300 200" style={{width: '100%', overflow: 'visible'}}>
-                  {/* Grid lines */}
-                  {[0, 1, 2, 3, 4].map(i => (
-                    <line key={i} x1="0" y1={i * 40} x2="300" y2={i * 40} stroke="#f0f0f0" strokeWidth="1" />
-                  ))}
-                  
-                  {/* Line path */}
-                  <polyline
-                    fill="none"
-                    stroke="#4BC0C0"
-                    strokeWidth="3"
-                    points={
-                      ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-                        .map((month, index) => {
-                          const monthData = dashboardData.monthlyCollection?.find(m => m.month === index + 1);
-                          const amount = monthData ? parseFloat(monthData.total) : 0;
-                          const maxAmount = Math.max(...(dashboardData.monthlyCollection?.map(m => parseFloat(m.total)) || [1]));
-                          const x = (index / 11) * 300;
-                          const y = maxAmount > 0 ? 160 - (amount / maxAmount) * 140 : 160;
-                          return `${x},${y}`;
-                        })
-                        .join(' ')
-                    }
-                  />
-                  
-                  {/* Data points */}
-                  {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, index) => {
-                    const monthData = dashboardData.monthlyCollection?.find(m => m.month === index + 1);
-                    const amount = monthData ? parseFloat(monthData.total) : 0;
-                    const maxAmount = Math.max(...(dashboardData.monthlyCollection?.map(m => parseFloat(m.total)) || [1]));
-                    const x = (index / 11) * 300;
-                    const y = maxAmount > 0 ? 160 - (amount / maxAmount) * 140 : 160;
-                    return (
-                      <circle
-                        key={month}
-                        cx={x}
-                        cy={y}
-                        r="4"
-                        fill="#4BC0C0"
-                        title={`${month}: UGX ${amount.toLocaleString()}`}
-                      />
-                    );
-                  })}
-                </svg>
-                
-                {/* Month labels */}
-                <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '10px'}}>
-                  {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(month => (
-                    <small key={month} style={{fontSize: '11px'}}>{month}</small>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="col-md-6 grid-margin stretch-card">
-          <div className="card">
-            <div className="card-body">
-              <p className="card-title">Recent Payments</p>
-              <div className="table-responsive">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Student</th>
-                      <th>Amount</th>
-                      <th>Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>Recent Payments</Typography>
+              <TableContainer component={Paper} elevation={0}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Student</TableCell>
+                      <TableCell>Amount</TableCell>
+                      <TableCell>Date</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
                     {dashboardData.recentPayments.map((payment) => (
-                      <tr key={payment.id}>
-                        <td>{payment.student?.first_name} {payment.student?.last_name}</td>
-                        <td>UGX {payment.amount?.toLocaleString()}</td>
-                        <td>{new Date(payment.payment_date).toLocaleDateString()}</td>
-                      </tr>
+                      <TableRow key={payment.id}>
+                        <TableCell>{payment.student?.first_name} {payment.student?.last_name}</TableCell>
+                        <TableCell>UGX {payment.amount?.toLocaleString()}</TableCell>
+                        <TableCell>{new Date(payment.payment_date).toLocaleDateString()}</TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+        </Grid>
 
-        <div className="col-md-6 grid-margin stretch-card">
-          <div className="card">
-            <div className="card-body">
-              <h4 className="card-title">Quick Actions</h4>
-              <div className="row">
-                <div className="col-md-6 mb-2">
-                  <button 
-                    className="btn btn-primary btn-block"
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>Quick Actions</Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={<PaymentIcon />}
                     onClick={() => setCurrentPage('fees-bulk-collection')}
+                    sx={{ mb: 1 }}
                   >
-                    <i className="ti-money"></i> Bulk Collection
-                  </button>
-                </div>
-                <div className="col-md-6 mb-2">
-                  <button 
-                    className="btn btn-info btn-block"
+                    Bulk Collection
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="info"
+                    startIcon={<EmailIcon />}
                     onClick={() => setCurrentPage('communications-bulk-reminders')}
+                    sx={{ mb: 1 }}
                   >
-                    <i className="ti-email"></i> Send Reminders
-                  </button>
-                </div>
-                <div className="col-md-6 mb-2">
-                  <button 
-                    className="btn btn-warning btn-block"
+                    Send Reminders
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="warning"
+                    startIcon={<AssessmentIcon />}
                     onClick={() => setCurrentPage('fees-reports')}
                   >
-                    <i className="ti-list"></i> Due Report
-                  </button>
-                </div>
-                <div className="col-md-6 mb-2">
-                  <button 
-                    className="btn btn-success btn-block"
+                    Due Report
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="success"
+                    startIcon={<AddIcon />}
                     onClick={() => setCurrentPage('fees-allocate')}
                   >
-                    <i className="ti-plus"></i> Allocate Fees
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+                    Allocate Fees
+                  </Button>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

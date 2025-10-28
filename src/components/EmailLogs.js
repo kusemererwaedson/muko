@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Box, Card, CardContent, Typography, Table, TableBody, TableCell,
+  TableContainer, TableHead, TableRow, Paper, Chip,
+  Skeleton
+} from '@mui/material';
 import { communicationAPI } from '../services/api';
-import { EmailLogsSkeleton } from './skeletons';
+
 
 const EmailLogs = () => {
   const [emailLogs, setEmailLogs] = useState([]);
@@ -22,75 +27,79 @@ const EmailLogs = () => {
   };
 
   if (loading) {
-    return <EmailLogsSkeleton />;
+    return (
+      <Box p={3}>
+        <Skeleton variant="text" width={200} height={30} sx={{ mb: 2 }} />
+        <Skeleton variant="rectangular" height={400} />
+      </Box>
+    );
   }
 
   return (
-    <div className="content-wrapper">
-      <div className="row">
-        <div className="col-md-12 grid-margin">
-          <div className="row">
-            <div className="col-12 col-xl-8 mb-4 mb-xl-0">
-              <h3 className="font-weight-bold">Email Logs</h3>
-              <h6 className="font-weight-normal mb-0">Track all sent emails and their delivery status</h6>
-            </div>
-          </div>
-        </div>
-      </div>
+    <Box>
+      <Box mb={4}>
+        <Typography variant="h4" gutterBottom>Email Logs</Typography>
+        <Typography variant="body1" color="text.secondary">
+          Track all sent emails and their delivery status
+        </Typography>
+      </Box>
 
-      <div className="row">
-        <div className="col-md-12 grid-margin stretch-card">
-          <div className="card">
-            <div className="card-body">
-              <p className="card-title">Email History</p>
-              <div className="table-responsive">
-                <table className="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Recipient</th>
-                      <th>Subject</th>
-                      <th>Type</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {emailLogs.map((log) => (
-                      <tr key={log.id}>
-                        <td>{new Date(log.sent_at || log.created_at).toLocaleDateString()}</td>
-                        <td>
-                          <div>
-                            <strong>{log.recipient_name}</strong>
-                            <br />
-                            <small className="text-muted">{log.recipient_email}</small>
-                          </div>
-                        </td>
-                        <td>{log.subject}</td>
-                        <td>
-                          <span className="badge badge-info">
-                            {log.email_type?.replace('_', ' ').toUpperCase()}
-                          </span>
-                        </td>
-                        <td>
-                          <span className={`badge ${log.status === 'sent' ? 'badge-success' : 'badge-danger'}`}>
-                            {log.status?.toUpperCase()}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>Email History</Typography>
+          <TableContainer component={Paper} elevation={0}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Recipient</TableCell>
+                  <TableCell>Subject</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell>Status</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {emailLogs.map((log) => (
+                  <TableRow key={log.id} hover>
+                    <TableCell>{new Date(log.sent_at || log.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <Box>
+                        <Typography variant="body2" fontWeight="medium">{log.recipient_name}</Typography>
+                        <Typography variant="caption" color="text.secondary">{log.recipient_email}</Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>{log.subject}</TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={log.email_type?.replace('_', ' ').toUpperCase()} 
+                        color="info" 
+                        size="small" 
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={log.status?.toUpperCase()}
+                        color={log.status === 'sent' ? 'success' : 'error'}
+                        size="small"
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
                 {emailLogs.length === 0 && (
-                  <div className="text-center py-4">
-                    <p className="text-muted">No email logs found</p>
-                  </div>
+                  <TableRow>
+                    <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        No email logs found
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

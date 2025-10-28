@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Box, Card, CardContent, Typography, Button, TextField, Select, MenuItem,
+  FormControl, InputLabel, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Grid, Dialog, DialogTitle, DialogContent, DialogActions, Chip,
+  Skeleton
+} from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 import { feeAPI, studentAPI } from '../services/api';
-import { FeePaymentsSkeleton } from './skeletons';
 
 const FeePayments = () => {
   const [payments, setPayments] = useState([]);
@@ -22,9 +28,13 @@ const FeePayments = () => {
   const fetchPayments = async () => {
     try {
       const response = await feeAPI.getPayments();
-      setPayments(response.data);
+      const paymentsData = response.data.data || response.data || [];
+      console.log('Payments response:', response.data);
+      console.log('Payments data:', paymentsData);
+      setPayments(Array.isArray(paymentsData) ? paymentsData : []);
     } catch (error) {
       console.error('Error fetching payments:', error);
+      setPayments([]);
     } finally {
       setLoading(false);
     }
@@ -33,42 +43,115 @@ const FeePayments = () => {
   const fetchStudents = async () => {
     try {
       const response = await studentAPI.getAll();
-      setStudents(response.data);
+      const studentsData = response.data.data || response.data || [];
+      setStudents(Array.isArray(studentsData) ? studentsData : []);
     } catch (error) {
       console.error('Error fetching students:', error);
+      setStudents([]);
     }
   };
 
   const fetchAllocations = async () => {
     try {
       const response = await feeAPI.getAllocations();
-      console.log('All allocations:', response.data);
-      const unpaidAllocations = response.data.filter(a => a.status !== 'paid');
+      const allocationsData = response.data.data || response.data || [];
+      const validAllocations = Array.isArray(allocationsData) ? allocationsData : [];
+      const unpaidAllocations = validAllocations.filter(a => a.status !== 'paid');
+      console.log('All allocations:', validAllocations);
       console.log('Unpaid allocations:', unpaidAllocations);
       setAllocations(unpaidAllocations);
     } catch (error) {
       console.error('Error fetching allocations:', error);
+      setAllocations([]);
     }
   };
 
   if (loading) {
-    return <FeePaymentsSkeleton />;
+    return (
+      <Box>
+        {/* Header Skeleton */}
+        <Box mb={4}>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item xs={12} md={8}>
+              <Skeleton variant="text" width={150} height={32} sx={{ mb: 1 }} />
+              <Skeleton variant="text" width={180} height={20} />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Box display="flex" justifyContent={{ xs: 'flex-start', md: 'flex-end' }} mt={{ xs: 2, md: 0 }}>
+                <Skeleton variant="rectangular" width={150} height={36} sx={{ borderRadius: 1 }} />
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+        
+        {/* Form Card Skeleton */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Skeleton variant="text" width={200} height={24} sx={{ mb: 2 }} />
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 1 }} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 1 }} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 1 }} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 1 }} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 1 }} />
+              </Grid>
+              <Grid item xs={12}>
+                <Skeleton variant="rectangular" height={80} sx={{ borderRadius: 1 }} />
+              </Grid>
+            </Grid>
+            <Box mt={2} display="flex" gap={1}>
+              <Skeleton variant="rectangular" width={120} height={36} sx={{ borderRadius: 1 }} />
+              <Skeleton variant="rectangular" width={70} height={36} sx={{ borderRadius: 1 }} />
+            </Box>
+          </CardContent>
+        </Card>
+        
+        {/* Payment History Table Skeleton */}
+        <Card>
+          <CardContent>
+            <Skeleton variant="text" width={140} height={24} sx={{ mb: 2 }} />
+            <TableContainer component={Paper} elevation={0}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    {['Student', 'Fee Type', 'Amount', 'Method', 'Date', 'Remarks'].map((header, i) => (
+                      <TableCell key={i}>
+                        <Skeleton variant="text" width={80} height={16} />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {[...Array(6)].map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton variant="text" width={120} height={16} /></TableCell>
+                      <TableCell><Skeleton variant="text" width={100} height={16} /></TableCell>
+                      <TableCell><Skeleton variant="text" width={80} height={16} /></TableCell>
+                      <TableCell><Skeleton variant="rectangular" width={60} height={20} sx={{ borderRadius: 3 }} /></TableCell>
+                      <TableCell><Skeleton variant="text" width={80} height={16} /></TableCell>
+                      <TableCell><Skeleton variant="text" width={100} height={16} /></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
+        </Card>
+      </Box>
+    );
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validate required fields
-    if (!formData.student_id || !formData.fee_allocation_id || !formData.amount || !formData.payment_date) {
-      alert('Please fill in all required fields.');
-      return;
-    }
-    
-    if (parseFloat(formData.amount) <= 0) {
-      alert('Amount must be greater than 0.');
-      return;
-    }
-    
     try {
       await feeAPI.createPayment(formData);
       fetchPayments();
@@ -84,178 +167,230 @@ const FeePayments = () => {
   };
 
   const getStudentAllocations = () => {
-    const studentAllocations = allocations.filter(a => a.student_id == formData.student_id);
-    console.log('Student ID:', formData.student_id);
-    console.log('Student allocations:', studentAllocations);
-    return studentAllocations;
+    if (!formData.student_id) return [];
+    return allocations.filter(a => Number(a.student_id) === Number(formData.student_id));
+  };
+
+  const handleClearForm = () => {
+    setFormData({
+      student_id: '', fee_allocation_id: '', amount: '', payment_method: 'cash',
+      payment_date: new Date().toISOString().split('T')[0], remarks: ''
+    });
   };
 
   return (
-    <div className="content-wrapper">
-      <div className="row">
-        <div className="col-md-12 grid-margin">
-          <div className="row">
-            <div className="col-12 col-xl-8 mb-4 mb-xl-0">
-              <h3 className="font-weight-bold">Fee Payments</h3>
-              <h6 className="font-weight-normal mb-0">Record fee payments</h6>
-            </div>
-            <div className="col-12 col-xl-4">
-              <div className="justify-content-end d-flex">
-                <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-                  {showForm ? 'Cancel' : 'Record Payment'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <Box>
+      <Box mb={4}>
+        <Grid container justifyContent="space-between" alignItems="center">
+          <Grid item xs={12} md={8}>
+            <Typography variant="h4" gutterBottom>Fee Payments</Typography>
+            <Typography variant="body1" color="text.secondary">
+              Record fee payments
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Box display="flex" justifyContent={{ xs: 'flex-start', md: 'flex-end' }} mt={{ xs: 2, md: 0 }}>
+              <Button
+                variant={showForm ? "outlined" : "contained"}
+                startIcon={<AddIcon />}
+                onClick={() => setShowForm(!showForm)}
+              >
+                {showForm ? 'Cancel' : 'Record Payment'}
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
 
-      {showForm && (
-        <div className="row">
-          <div className="col-md-12 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <h4 className="card-title">Record Fee Payment</h4>
-                <form onSubmit={handleSubmit}>
-                  <div className="row">
-                    <div className="col-md-6">
-                      <div className="form-group">
-                        <label>Student</label>
-                        <select
-                          className="form-control"
-                          value={formData.student_id}
-                          onChange={(e) => setFormData({...formData, student_id: e.target.value, fee_allocation_id: ''})}
-                          required
-                        >
-                          <option value="">Select Student</option>
-                          {students.map((student) => (
-                            <option key={student.id} value={student.id}>
-                              {student.register_no} - {student.first_name} {student.last_name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="form-group">
-                        <label>Fee Allocation</label>
-                        <select
-                          className="form-control"
-                          value={formData.fee_allocation_id}
-                          onChange={(e) => setFormData({...formData, fee_allocation_id: e.target.value})}
-                          required
-                          disabled={!formData.student_id}
-                        >
-                          <option value="">Select Fee Allocation</option>
-                          {getStudentAllocations().map((allocation) => (
-                            <option key={allocation.id} value={allocation.id}>
-                              {allocation.fee_group?.name} - UGX {allocation.amount?.toLocaleString()}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-md-4">
-                      <div className="form-group">
-                        <label>Amount (UGX)</label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          value={formData.amount}
-                          onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                          placeholder="e.g., 500000"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="form-group">
-                        <label>Payment Method</label>
-                        <select
-                          className="form-control"
-                          value={formData.payment_method}
-                          onChange={(e) => setFormData({...formData, payment_method: e.target.value})}
-                        >
-                          <option value="cash">Cash</option>
-                          <option value="bank_transfer">Bank Transfer</option>
-                          <option value="cheque">Cheque</option>
-                          <option value="online">Online</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="form-group">
-                        <label>Payment Date</label>
-                        <input
-                          type="date"
-                          className="form-control"
-                          value={formData.payment_date}
-                          onChange={(e) => setFormData({...formData, payment_date: e.target.value})}
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label>Remarks</label>
-                    <textarea
-                      className="form-control"
-                      value={formData.remarks}
-                      onChange={(e) => setFormData({...formData, remarks: e.target.value})}
-                      placeholder="e.g., paid 200,000 ugx"
-                    />
-                  </div>
-                  <button type="submit" className="btn btn-primary mr-2">Record Payment</button>
-                  <button type="button" className="btn btn-light" onClick={() => setShowForm(false)}>Cancel</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="row">
-        <div className="col-md-12 grid-margin stretch-card">
-          <div className="card">
-            <div className="card-body">
-              <p className="card-title mb-0">Payment History</p>
-              <div className="table-responsive">
-                <table className="table table-striped table-borderless">
-                  <thead>
-                    <tr>
-                      <th>Student</th>
-                      <th>Fee Type</th>
-                      <th>Amount</th>
-                      <th>Method</th>
-                      <th>Date</th>
-                      <th>Remarks</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {payments.map((payment) => (
-                      <tr key={payment.id}>
-                        <td>{payment.student?.first_name} {payment.student?.last_name}</td>
-                        <td>{payment.fee_allocation?.fee_group?.fee_type?.name}</td>
-                        <td>UGX {payment.amount?.toLocaleString()}</td>
-                        <td>
-                          <div className="badge badge-outline-success">
-                            {payment.payment_method}
-                          </div>
-                        </td>
-                        <td>{new Date(payment.payment_date).toLocaleDateString()}</td>
-                        <td>{payment.remarks}</td>
-                      </tr>
+      <Dialog 
+        open={showForm} 
+        onClose={() => setShowForm(false)} 
+        maxWidth="md" 
+        fullWidth
+        PaperProps={{
+          sx: { minHeight: '400px' }
+        }}
+      >
+        <DialogTitle>Record Fee Payment</DialogTitle>
+        <DialogContent>
+          <Box component="form" onSubmit={handleSubmit} sx={{ pt: 2 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth required>
+                  <InputLabel shrink>Student</InputLabel>
+                  <Select
+                    value={formData.student_id}
+                    label="Student"
+                    displayEmpty
+                    onChange={(e) => setFormData({...formData, student_id: e.target.value, fee_allocation_id: ''})}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 300,
+                        },
+                      },
+                    }}
+                  >
+                    {students.map((student) => (
+                      <MenuItem 
+                        key={student.id} 
+                        value={student.id}
+                        sx={{ py: 1.5 }}
+                      >
+                        <Box>
+                          <Typography variant="body1" fontWeight={500}>
+                            {student.register_no}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {student.first_name} {student.last_name}
+                          </Typography>
+                        </Box>
+                      </MenuItem>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth required disabled={!formData.student_id}>
+                  <InputLabel shrink>Fee Type</InputLabel>
+                  <Select
+                    value={formData.fee_allocation_id}
+                    label="Fee Type"
+                    displayEmpty
+                    onChange={(e) => setFormData({...formData, fee_allocation_id: e.target.value})}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 300,
+                        },
+                      },
+                    }}
+                  >
+                    {getStudentAllocations().length === 0 ? (
+                      <MenuItem disabled>
+                        <Typography variant="body2" color="text.secondary">
+                          No unpaid allocations for this student
+                        </Typography>
+                      </MenuItem>
+                    ) : (
+                      getStudentAllocations().map((allocation) => (
+                        <MenuItem 
+                          key={allocation.id} 
+                          value={allocation.id}
+                          sx={{ py: 1.5 }}
+                        >
+                          <Box>
+                            <Typography variant="body1" fontWeight={500}>
+                              {allocation.fee_group?.name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              UGX {allocation.amount?.toLocaleString()}
+                            </Typography>
+                          </Box>
+                        </MenuItem>
+                      ))
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Amount (UGX)"
+                  type="number"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Payment Method</InputLabel>
+                  <Select
+                    value={formData.payment_method}
+                    label="Payment Method"
+                    onChange={(e) => setFormData({...formData, payment_method: e.target.value})}
+                  >
+                    <MenuItem value="cash">Cash</MenuItem>
+                    <MenuItem value="bank_transfer">Bank Transfer</MenuItem>
+                    <MenuItem value="cheque">Cheque</MenuItem>
+                    <MenuItem value="online">Online</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Payment Date"
+                  type="date"
+                  value={formData.payment_date}
+                  onChange={(e) => setFormData({...formData, payment_date: e.target.value})}
+                  required
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Remarks"
+                  multiline
+                  rows={3}
+                  value={formData.remarks}
+                  onChange={(e) => setFormData({...formData, remarks: e.target.value})}
+                  placeholder="Optional payment notes..."
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={handleClearForm} color="inherit">
+            Clear
+          </Button>
+          <Box sx={{ flex: 1 }} />
+          <Button onClick={() => setShowForm(false)} color="inherit">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} variant="contained" disabled={!formData.fee_allocation_id}>
+            Record Payment
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>Payment History</Typography>
+          <TableContainer component={Paper} elevation={0}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Student</TableCell>
+                  <TableCell>Fee Type</TableCell>
+                  <TableCell>Amount</TableCell>
+                  <TableCell>Method</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Remarks</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {payments.map((payment) => (
+                  <TableRow key={payment.id} hover>
+                    <TableCell>{payment.student?.first_name} {payment.student?.last_name}</TableCell>
+                    <TableCell>{payment.fee_allocation?.fee_group?.fee_type?.name}</TableCell>
+                    <TableCell>UGX {payment.amount?.toLocaleString()}</TableCell>
+                    <TableCell>
+                      <Chip label={payment.payment_method} size="small" color="success" />
+                    </TableCell>
+                    <TableCell>{new Date(payment.payment_date).toLocaleDateString()}</TableCell>
+                    <TableCell>{payment.remarks}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 
