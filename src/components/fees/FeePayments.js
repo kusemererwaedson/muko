@@ -6,7 +6,7 @@ import {
   Skeleton
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
-import { feeAPI, studentAPI } from '../services/api';
+import { feeAPI, studentAPI } from '../../services/api';
 
 const FeePayments = () => {
   const [payments, setPayments] = useState([]);

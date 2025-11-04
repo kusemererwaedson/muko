@@ -5,7 +5,7 @@ import {
   TableHead, TableRow, Paper, Grid, Chip, CircularProgress
 } from '@mui/material';
 import { Assessment as AssessmentIcon, FilterList } from '@mui/icons-material';
-import { feeAPI, academicAPI } from '../services/api';
+import { feeAPI, academicAPI } from '../../services/api';
 
 const Reports = () => {
   const [reportData, setReportData] = useState([]);

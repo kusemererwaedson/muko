@@ -6,7 +6,7 @@ import {
   DialogActions, Chip
 } from '@mui/material';
 import { Send as SendIcon } from '@mui/icons-material';
-import { communicationAPI } from '../services/api';
+import { communicationAPI } from '../../services/api';
 
 const SMSManagement = () => {
   const [smsLogs, setSmsLogs] = useState([]);

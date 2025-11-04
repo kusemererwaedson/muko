@@ -1,52 +1,19 @@
+// src/components/Students.js
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Chip,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Grid,
-  InputAdornment,
-  Pagination,
-  Tooltip,
-  Skeleton,
-  useTheme,
-  useMediaQuery,
-  Stack,
-  Divider
+  Box,Card,CardContent,Typography,Button,TextField,Select,MenuItem,FormControl,InputLabel,
+  Table,TableBody,TableCell,TableContainer,TableHead,TableRow,Paper,Chip,IconButton,
+  Dialog,DialogTitle,DialogContent,DialogActions,Grid,InputAdornment,Pagination,
+  Tooltip,Skeleton,useTheme,useMediaQuery,Stack,Divider
 } from '@mui/material';
 import {
-  Add as AddIcon,
-  Search as SearchIcon,
-  Edit as EditIcon,
-  Visibility as VisibilityIcon,
-  Payment as PaymentIcon,
-  Clear as ClearIcon,
-  People as PeopleIcon,
-  CloudDownload as CloudDownloadIcon,
+  Add as AddIcon,Search as SearchIcon,Edit as EditIcon,Visibility as VisibilityIcon,
+  Payment as PaymentIcon,Clear as ClearIcon,People as PeopleIcon,CloudDownload as CloudDownloadIcon,
   Layers as LayersIcon
 } from '@mui/icons-material';
-import { studentAPI, academicAPI } from '../services/api';
+import { studentAPI, academicAPI } from '../../services/api';
 
-import StudentImportExport from './StudentImportExport';
+import StudentImportExport from './StudentImportExport.js';
 
 const Students = ({ setCurrentPage }) => {
   const theme = useTheme();

@@ -11,7 +11,7 @@ import {
   Warning as WarningIcon
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { feeAPI, studentAPI } from '../services/api';
+import { feeAPI, studentAPI } from '../../services/api';
 
 const FeeAllocate = () => {
   const [students, setStudents] = useState([]);

@@ -1,3 +1,4 @@
+// src/components/academic/AcademicClasses.js
 import React, { useState, useEffect } from 'react';
 import {
   Box, Card, CardContent, Typography, Button, TextField, Select, MenuItem,
@@ -6,7 +7,7 @@ import {
   DialogActions, Snackbar, Alert, CircularProgress, IconButton, Tooltip, Skeleton
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Class as ClassIcon, Group as GroupIcon } from '@mui/icons-material';
-import { academicAPI } from '../services/api';
+import { academicAPI } from '../../services/api';
 
 const AcademicClasses = () => {
   const [classes, setClasses] = useState([]);
@@ -150,107 +151,107 @@ const AcademicClasses = () => {
                     <TableHead>
                       <TableRow sx={{ bgcolor: 'grey.100' }}>
                         <TableCell>Name</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {streams.length === 0 ? (
-                              <TableRow>
-                                <TableCell align="center">No streams found.</TableCell>
-                              </TableRow>
-                            ) : (
-                              streams.map((stream) => (
-                                <TableRow key={stream.id} hover>
-                                  <TableCell>{stream.name}</TableCell>
-                                </TableRow>
-                              ))
-                            )}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {streams.length === 0 ? (
+                        <TableRow>
+                          <TableCell align="center">No streams found.</TableCell>
+                        </TableRow>
+                      ) : (
+                        streams.map((stream) => (
+                          <TableRow key={stream.id} hover>
+                            <TableCell>{stream.name}</TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
-            <Dialog open={showModal} onClose={() => setShowModal(false)} fullWidth maxWidth="sm" aria-labelledby="add-edit-dialog">
-              <DialogTitle id="add-edit-dialog">
-                {modalType === 'class' ? 'Add Class' : 'Add Stream'}
-              </DialogTitle>
-              <DialogContent>
-                <form onSubmit={handleSubmit}>
-                  {modalType === 'class' ? (
-                    <>
-                      <TextField
-                        label="Class Name"
-                        value={formData.name}
-                        onChange={e => setFormData({ ...formData, name: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                        autoFocus
-                      />
-                      <FormControl fullWidth margin="normal" required>
-                        <InputLabel>Level</InputLabel>
-                        <Select
-                          value={formData.level_id}
-                          onChange={e => setFormData({ ...formData, level_id: e.target.value })}
-                          label="Level"
-                        >
-                          {levels.map(level => (
-                            <MenuItem key={level.id} value={level.id}>{level.name}</MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                      <TextField
-                        label="Year of Study"
-                        value={formData.year_of_study}
-                        onChange={e => setFormData({ ...formData, year_of_study: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                      />
-                      <TextField
-                        label="Capacity"
-                        type="number"
-                        value={formData.capacity}
-                        onChange={e => setFormData({ ...formData, capacity: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <TextField
-                        label="Stream Name"
-                        value={streamFormData.name}
-                        onChange={e => setStreamFormData({ ...streamFormData, name: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                        autoFocus
-                        placeholder="e.g., A, B, Science, Arts"
-                      />
-                    </>
-                  )}
-                </form>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setShowModal(false)} color="secondary">Cancel</Button>
-                <Button type="submit" variant="contained" onClick={handleSubmit} disabled={dialogLoading}>
-                  {dialogLoading ? <CircularProgress size={24} /> : 'Save'}
-                </Button>
-              </DialogActions>
-            </Dialog>
+      <Dialog open={showModal} onClose={() => setShowModal(false)} fullWidth maxWidth="sm" aria-labelledby="add-edit-dialog">
+        <DialogTitle id="add-edit-dialog">
+          {modalType === 'class' ? 'Add Class' : 'Add Stream'}
+        </DialogTitle>
+        <DialogContent>
+          <form onSubmit={handleSubmit}>
+            {modalType === 'class' ? (
+              <>
+                <TextField
+                  label="Class Name"
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  fullWidth
+                  margin="normal"
+                  required
+                  autoFocus
+                />
+                <FormControl fullWidth margin="normal" required>
+                  <InputLabel>Level</InputLabel>
+                  <Select
+                    value={formData.level_id}
+                    onChange={e => setFormData({ ...formData, level_id: e.target.value })}
+                    label="Level"
+                  >
+                    {levels.map(level => (
+                      <MenuItem key={level.id} value={level.id}>{level.name}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <TextField
+                  label="Year of Study"
+                  value={formData.year_of_study}
+                  onChange={e => setFormData({ ...formData, year_of_study: e.target.value })}
+                  fullWidth
+                  margin="normal"
+                  required
+                />
+                <TextField
+                  label="Capacity"
+                  type="number"
+                  value={formData.capacity}
+                  onChange={e => setFormData({ ...formData, capacity: e.target.value })}
+                  fullWidth
+                  margin="normal"
+                  required
+                />
+              </>
+            ) : (
+              <>
+                <TextField
+                  label="Stream Name"
+                  value={streamFormData.name}
+                  onChange={e => setStreamFormData({ ...streamFormData, name: e.target.value })}
+                  fullWidth
+                  margin="normal"
+                  required
+                  autoFocus
+                  placeholder="e.g., A, B, Science, Arts"
+                />
+              </>
+            )}
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowModal(false)} color="secondary">Cancel</Button>
+          <Button type="submit" variant="contained" onClick={handleSubmit} disabled={dialogLoading}>
+            {dialogLoading ? <CircularProgress size={24} /> : 'Save'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-            <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-              <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-                {snackbar.message}
-              </Alert>
-            </Snackbar>
-  </Box>
-);
+      <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
 }
 
 export default AcademicClasses;

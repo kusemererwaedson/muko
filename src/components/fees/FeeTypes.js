@@ -21,7 +21,7 @@ import {
   Skeleton
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
-import { feeAPI } from '../services/api';
+import { feeAPI } from '../../services/api';
 
 
 const FeeTypes = () => {

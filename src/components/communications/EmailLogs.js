@@ -4,7 +4,7 @@ import {
   TableContainer, TableHead, TableRow, Paper, Chip,
   Skeleton
 } from '@mui/material';
-import { communicationAPI } from '../services/api';
+import { communicationAPI } from '../../services/api';
 
 
 const EmailLogs = () => {

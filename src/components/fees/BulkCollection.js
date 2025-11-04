@@ -6,7 +6,7 @@ import {
   Skeleton, Dialog, DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
 import { Payment as PaymentIcon, CheckCircle as SuccessIcon, Error as ErrorIcon } from '@mui/icons-material';
-import { studentAPI, feeAPI } from '../services/api';
+import { studentAPI, feeAPI } from '../../services/api';
 
 
 const BulkCollection = () => {

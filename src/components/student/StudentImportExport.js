@@ -7,7 +7,7 @@ import {
 import {
   CloudDownload, CloudUpload, Description, Sync, Check, Error
 } from '@mui/icons-material';
-import { studentAPI } from '../services/api';
+import { studentAPI } from '../../services/api';
 
 const StudentImportExport = ({ onImportComplete, className = '' }) => {
   const [importing, setImporting] = useState(false);

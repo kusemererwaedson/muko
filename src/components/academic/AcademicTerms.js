@@ -6,7 +6,7 @@ import {
   DialogActions, Chip, Checkbox, FormControlLabel
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
-import { academicAPI } from '../services/api';
+import { academicAPI } from '../../services/api';
 
 const AcademicTerms = () => {
   const [terms, setTerms] = useState([]);

@@ -5,7 +5,7 @@ import {
   Skeleton
 } from '@mui/material';
 import { Send as SendIcon, Clear as ClearIcon } from '@mui/icons-material';
-import { communicationAPI, studentAPI } from '../services/api';
+import { communicationAPI, studentAPI } from '../../services/api';
 
 
 const BulkReminders = () => {

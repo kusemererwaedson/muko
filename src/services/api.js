@@ -99,6 +99,7 @@ export const feeAPI = {
   sendReminders: () => api.post('/fees/send-reminders'),
 };
 
+// accounting
 export const accountingAPI = {
   getAccounts: () => api.get('/accounting/accounts'),
   createAccount: (data) => api.post('/accounting/accounts', data),

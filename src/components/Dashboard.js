@@ -1,3 +1,4 @@
+// src/components/Dashboard.js
 import React, { useState, useEffect } from 'react';
 import {
   Grid,
@@ -18,13 +19,17 @@ import {
   useTheme,
   useMediaQuery,
   Stack,
-  alpha
+  alpha,
+  Divider
 } from '@mui/material';
 import {
   TrendingUp,
   TrendingDown,
   People,
-  AttachMoney
+  AttachMoney,
+  AccountBalance,
+  PhoneAndroid,
+  Money
 } from '@mui/icons-material';
 import {
   Chart as ChartJS,
@@ -63,7 +68,12 @@ const Dashboard = () => {
     totalDue: 0,
     overdueCount: 0,
     recentPayments: [],
-    monthlyCollection: []
+    monthlyCollection: [],
+    totalExpenses: 0,
+    cashAtHand: 0,
+    cashInBank: 0,
+    cashOnMobileMoney: 0,
+    accounts: []
   });
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +92,6 @@ const Dashboard = () => {
       },
     ],
   };
-  console.log('Monthly Collection Data:', dashboardData.monthlyCollection);
 
   const feeStatusData = {
     labels: ['Paid', 'Pending', 'Overdue'],
@@ -98,7 +107,6 @@ const Dashboard = () => {
       },
     ],
   };
-  console.log('Fee Status Data:', [dashboardData.totalCollected, dashboardData.totalDue, dashboardData.overdueAmount]);
 
   const expenseBreakdownData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -112,7 +120,6 @@ const Dashboard = () => {
       },
     ],
   };
-  console.log('Expense Categories:', dashboardData.expenseCategories);
 
   const chartOptions = {
     responsive: true,
@@ -183,6 +190,9 @@ const Dashboard = () => {
           ))}
         </Box>
         
+        {/* Financial Summary Skeleton */}
+        <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1, mb: 3 }} />
+        
         {/* Charts Skeleton */}
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: { xs: 2, md: 4 } }}>
           {[...Array(4)].map((_, i) => (
@@ -195,43 +205,8 @@ const Dashboard = () => {
           ))}
         </Box>
         
-        {/* Bottom Section Skeleton */}
-        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent sx={{ p: { xs: 1, sm: 2 } }}>
-                <Skeleton variant="text" width={200} height={24} sx={{ mb: 2 }} />
-                <Skeleton variant="rectangular" height={{ xs: 180, sm: 220, md: 250 }} />
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent sx={{ p: { xs: 1, sm: 2 } }}>
-                <Skeleton variant="text" width={150} height={24} sx={{ mb: 2 }} />
-                {[...Array(5)].map((_, i) => (
-                  <Box key={i} display="flex" justifyContent="space-between" alignItems="center" py={1}>
-                    <Skeleton variant="text" width={120} height={16} />
-                    <Skeleton variant="rectangular" width={80} height={24} sx={{ borderRadius: 3 }} />
-                  </Box>
-                ))}
-                <Box mt={2}>
-                  <Skeleton variant="text" width={120} height={20} sx={{ mb: 1 }} />
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      <Skeleton variant="text" width={100} height={20} />
-                      <Skeleton variant="text" width={60} height={14} />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Skeleton variant="text" width={100} height={20} />
-                      <Skeleton variant="text" width={60} height={14} />
-                    </Grid>
-                  </Grid>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+        {/* Accounts Table Skeleton */}
+        <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 1, mb: 3 }} />
         
         {/* Transactions Table Skeleton */}
         <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} mt={2}>
@@ -386,12 +361,14 @@ const Dashboard = () => {
                    <Typography variant="body2" sx={{ fontSize: '0.75rem', fontWeight: 600, opacity: 0.9 }}>
                      Total Due
                    </Typography>
-                   <Typography variant="h6" sx={{                      fontWeight: 500, 
+                   <Typography variant="h6" sx={{ 
+                     fontWeight: 500, 
                      fontSize: '1.0rem', 
                      lineHeight: 1.2,
                      overflow: 'hidden',
                      textOverflow: 'ellipsis',
-                     whiteSpace: 'nowrap' }}>
+                     whiteSpace: 'nowrap' 
+                   }}>
                      UGX {dashboardData.totalDue?.toLocaleString()}
                    </Typography>
                  </Stack>
@@ -428,15 +405,17 @@ const Dashboard = () => {
                <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                  <Stack spacing={0.5} flex={1}>
                    <Typography variant="body2" sx={{ fontSize: '0.75rem', fontWeight: 600, opacity: 0.9 }}>
-                     Overdue Fees
+                     Total Expenses
                    </Typography>
-                   <Typography variant="h5" sx={{                      fontWeight: 500, 
+                   <Typography variant="h5" sx={{ 
+                     fontWeight: 500, 
                      fontSize: '1.0rem', 
                      lineHeight: 1.2,
                      overflow: 'hidden',
                      textOverflow: 'ellipsis',
-                     whiteSpace: 'nowrap' }}>
-                     {dashboardData.overdueCount}
+                     whiteSpace: 'nowrap' 
+                   }}>
+                     UGX {dashboardData.totalExpenses?.toLocaleString()}
                    </Typography>
                  </Stack>
                  <Box sx={{
@@ -493,6 +472,122 @@ const Dashboard = () => {
            </Card>
          </Grid>
       </Grid>
+
+      {/* Financial Summary Card */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>Financial Summary</Typography>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ 
+                p: 2, 
+                bgcolor: alpha(theme.palette.success.main, 0.1), 
+                borderRadius: 2,
+                border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`
+              }}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Box sx={{
+                    p: 1.5,
+                    bgcolor: alpha(theme.palette.success.main, 0.2),
+                    borderRadius: 2,
+                    display: 'flex'
+                  }}>
+                    <Money sx={{ fontSize: 32, color: theme.palette.success.main }} />
+                  </Box>
+                  <Stack>
+                    <Typography variant="caption" color="text.secondary">Cash at Hand</Typography>
+                    <Typography variant="h6" color="success.main" fontWeight="bold">
+                      UGX {dashboardData.cashAtHand?.toLocaleString()}
+                    </Typography>
+                  </Stack>
+                </Stack>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ 
+                p: 2, 
+                bgcolor: alpha(theme.palette.primary.main, 0.1), 
+                borderRadius: 2,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`
+              }}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Box sx={{
+                    p: 1.5,
+                    bgcolor: alpha(theme.palette.primary.main, 0.2),
+                    borderRadius: 2,
+                    display: 'flex'
+                  }}>
+                    <AccountBalance sx={{ fontSize: 32, color: theme.palette.primary.main }} />
+                  </Box>
+                  <Stack>
+                    <Typography variant="caption" color="text.secondary">Cash in Bank</Typography>
+                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                      UGX {dashboardData.cashInBank?.toLocaleString()}
+                    </Typography>
+                  </Stack>
+                </Stack>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ 
+                p: 2, 
+                bgcolor: alpha(theme.palette.info.main, 0.1), 
+                borderRadius: 2,
+                border: `1px solid ${alpha(theme.palette.info.main, 0.3)}`
+              }}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Box sx={{
+                    p: 1.5,
+                    bgcolor: alpha(theme.palette.info.main, 0.2),
+                    borderRadius: 2,
+                    display: 'flex'
+                  }}>
+                    <PhoneAndroid sx={{ fontSize: 32, color: theme.palette.info.main }} />
+                  </Box>
+                  <Stack>
+                    <Typography variant="caption" color="text.secondary">Mobile Money</Typography>
+                    <Typography variant="h6" color="info.main" fontWeight="bold">
+                      UGX {dashboardData.cashOnMobileMoney?.toLocaleString()}
+                    </Typography>
+                  </Stack>
+                </Stack>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ 
+                p: 2, 
+                bgcolor: alpha(theme.palette.warning.main, 0.1), 
+                borderRadius: 2,
+                border: `1px solid ${alpha(theme.palette.warning.main, 0.3)}`
+              }}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Box sx={{
+                    p: 1.5,
+                    bgcolor: alpha(theme.palette.warning.main, 0.2),
+                    borderRadius: 2,
+                    display: 'flex'
+                  }}>
+                    <AttachMoney sx={{ fontSize: 32, color: theme.palette.warning.main }} />
+                  </Box>
+                  <Stack>
+                    <Typography variant="caption" color="text.secondary">Total Balance</Typography>
+                    <Typography variant="h6" color="warning.main" fontWeight="bold">
+                      UGX {(
+                        (dashboardData.cashAtHand || 0) + 
+                        (dashboardData.cashInBank || 0) + 
+                        (dashboardData.cashOnMobileMoney || 0)
+                      ).toLocaleString()}
+                    </Typography>
+                  </Stack>
+                </Stack>
+              </Box>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
 
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: { xs: 2, md: 4 } }}>
           <Card sx={{ flex: '1 1 400px' }}>
@@ -553,7 +648,7 @@ const Dashboard = () => {
                     <Box display="flex" alignItems="center" mb={1}>
                       <TrendingDown color="error" sx={{ mr: 1 }} />
                       <Typography variant="h6" color="error.main">
-                        UGX {transactions.filter(t => t.type === 'debit').reduce((sum, t) => sum + parseFloat(t.amount || 0), 0).toLocaleString()}
+                        UGX {dashboardData.totalExpenses?.toLocaleString()}
                       </Typography>
                     </Box>
                     <Typography variant="body2" color="text.secondary">Expenses</Typography>
@@ -564,6 +659,65 @@ const Dashboard = () => {
           </Card>
       </Box>
 
+      {/* Account Balances Table */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>Account Balances</Typography>
+          <TableContainer component={Paper} elevation={0}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Account Name</TableCell>
+                  <TableCell>Account Type</TableCell>
+                  <TableCell>Provider</TableCell>
+                  <TableCell align="right">Current Balance</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {dashboardData.accounts && dashboardData.accounts.length > 0 ? (
+                  dashboardData.accounts.map((account) => (
+                    <TableRow key={account.id} hover>
+                      <TableCell>{account.name}</TableCell>
+                      <TableCell>
+                        <Chip 
+                          label={account.account_type} 
+                          color={
+                            account.account_type === 'cash' ? 'success' :
+                            account.account_type === 'bank' ? 'primary' : 'info'
+                          }
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>{account.provider || '-'}</TableCell>
+                      <TableCell align="right">
+                        <Typography 
+                          variant="body2" 
+                          fontWeight="bold"
+                          color={parseFloat(account.current_balance) > 0 ? 'success.main' : 'text.secondary'}
+                        >
+                          UGX {parseFloat(account.current_balance).toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                          })}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        No accounts found
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
+
       <Card sx={{ width: '100%' }}>
         <CardContent sx={{ p: { xs: 1, sm: 2 } }}>
           <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>All Transactions</Typography>
@@ -572,36 +726,39 @@ const Dashboard = () => {
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ minWidth: 100 }}>Date</TableCell>
-                  <TableCell sx={{ minWidth: 120 }}>Voucher Head</TableCell>
-                  <TableCell sx={{ minWidth: 120 }}>Account</TableCell>
-                  <TableCell sx={{ minWidth: 80 }}>Type</TableCell>
-                  <TableCell sx={{ minWidth: 100 }}>Amount</TableCell>
+                  <TableCell sx={{ minWidth: 120 }}>Voucher</TableCell>
                   <TableCell sx={{ minWidth: 150 }}>Description</TableCell>
+                  <TableCell sx={{ minWidth: 100 }}>Type</TableCell>
+                  <TableCell sx={{ minWidth: 120 }} align="right">Amount</TableCell>
+                  <TableCell sx={{ minWidth: 100 }}>Account</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {transactions.length > 0 ? transactions.map((transaction) => (
-                  <TableRow key={transaction.id} hover>
-                    <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
-                    <TableCell>{transaction.voucher_head?.name || 'N/A'}</TableCell>
-                    <TableCell>{transaction.account?.name || 'N/A'}</TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={transaction.type} 
-                        color={transaction.type === 'credit' ? 'success' : 'error'}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>UGX {transaction.amount?.toLocaleString()}</TableCell>
-                    <TableCell sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {transaction.description || 'N/A'}
-                    </TableCell>
-                  </TableRow>
-                )) : (
+                {dashboardData.recentPayments && dashboardData.recentPayments.length > 0 ? (
+                  dashboardData.recentPayments.map((payment) => (
+                    <TableRow key={payment.id} hover>
+                      <TableCell>{new Date(payment.payment_date).toLocaleDateString()}</TableCell>
+                      <TableCell>PAY-{payment.id}</TableCell>
+                      <TableCell>
+                        {payment.student?.first_name} {payment.student?.last_name} - 
+                        {payment.fee_allocation?.fee_group?.fee_type?.name}
+                      </TableCell>
+                      <TableCell>
+                        <Chip label="Credit" color="success" size="small" />
+                      </TableCell>
+                      <TableCell align="right">
+                        <Typography variant="body2" color="success.main" fontWeight="bold">
+                          UGX {parseFloat(payment.amount).toLocaleString()}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>{payment.payment_method}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
                   <TableRow>
                     <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                       <Typography variant="body2" color="text.secondary">
-                        No transactions found
+                        No recent transactions found
                       </Typography>
                     </TableCell>
                   </TableRow>

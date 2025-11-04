@@ -6,7 +6,7 @@ import {
   Skeleton
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
-import { accountingAPI } from '../services/api';
+import { accountingAPI } from '../../services/api';
 
 
 const VoucherHeads = () => {

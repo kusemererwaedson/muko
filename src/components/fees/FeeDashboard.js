@@ -14,7 +14,7 @@ import {
   Assessment as AssessmentIcon,
   Add as AddIcon
 } from '@mui/icons-material';
-import { feeAPI } from '../services/api';
+import { feeAPI } from '../../services/api';
 
 
 const FeeDashboard = ({ setCurrentPage }) => {
