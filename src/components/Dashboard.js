@@ -242,7 +242,7 @@ const Dashboard = () => {
     <Box>
       <Box mb={4}>
         <Typography variant="h4" gutterBottom>
-          Welcome to Muko High School
+          Welcome to School Sync!
         </Typography>
         <Typography variant="body1" color="text.secondary">
           All systems are running smoothly! You have{' '}

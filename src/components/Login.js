@@ -49,7 +49,7 @@ const Login = ({ onLogin }) => {
           <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
             <Box textAlign="center" mb={3}>
               <Typography variant="h4" color="primary" gutterBottom sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
-                Muko High School
+                School Sync
               </Typography>
             </Box>
             <Typography variant="h5" gutterBottom sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>

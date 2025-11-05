@@ -37,12 +37,10 @@ api.interceptors.response.use(
   }
 );
 
-
 export const authAPI = {
   login: (credentials) => api.post('/login', credentials),
   logout: () => api.post('/logout').catch(error => {
     console.warn('Logout API call failed:', error);
-    // Don't reject - allow logout to continue even if server call fails
     return Promise.resolve();
   }),
   getUser: () => api.get('/user'),
@@ -63,15 +61,41 @@ export const studentAPI = {
   // Filtering
   search: (params) => api.get('/students', { params }),
   
-  // Import/Export
-  exportExcel: (format = 'csv') => api.get('/students/export', { 
-    params: { format },
-    responseType: 'blob' 
-  }),
-  importExcel: (formData) => api.post('/students/import', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  }),
-  downloadTemplate: () => api.get('/students/template', { responseType: 'blob' }),
+  // Import/Export with proper blob handling
+  exportExcel: (format = 'csv') => {
+    console.log('Exporting students as', format);
+    return api.get('/students/export', { 
+      params: { format },
+      responseType: 'blob',
+      headers: {
+        'Accept': format === 'excel' 
+          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          : 'text/csv'
+      }
+    });
+  },
+  
+  importExcel: (formData) => {
+    console.log('Importing students...');
+    return api.post('/students/import', formData, {
+      headers: { 
+        'Content-Type': 'multipart/form-data',
+        'Accept': 'application/json'
+      },
+      // Don't set responseType to blob for import - we need JSON response
+    });
+  },
+  
+  downloadTemplate: () => {
+    console.log('Downloading student import template...');
+    return api.get('/students/template', { 
+      responseType: 'blob',
+      headers: {
+        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      }
+    });
+  },
+  
   syncClasses: () => api.post('/students/sync-classes'),
 };
 
